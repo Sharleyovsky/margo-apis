@@ -13,7 +13,9 @@ npm i agysx/margo-apis
 ```js
 const apis = require('margo-apis').default;
 
-const rank = apis.getRankPage(1, 'dev');
-const clan = apis.getClan(1, 'dev');
-const profile = apis.getProfile(1, 'dev');
+(async () => {
+  const rank = await apis.getRankPage(1, 'dev');
+  const clan = await apis.getClan(1, 'dev');
+  const profile = await apis.getProfile(1, 'dev');
+})();
 ```
