@@ -15,6 +15,7 @@ export interface IGuild {
 export class ProfileInfo {
   constructor(
     public nick: string,
+    public outfit: string,
     public rank: string,
     public last: Date,
     public forumPosts: number,
@@ -94,8 +95,6 @@ export class ProfileData {
       return element.toString();
     }
     return destruct(root);
-    // .replace(/<span style='color:(\w*)'>(.*)<\/span>/gis, '[c=$1]$2[/c]')
-    // .replace(/<span style='font-size:(\w*)px'>(.*)<\/span>/gis, '[size=$1]$2[/size]')
   }
 }
 
@@ -148,6 +147,7 @@ async function parseMainInfo(root: HTMLElement) {
   }
   return new ProfileInfo(
     header.querySelector('span').text.trim(),
+    'http://' + root.querySelector('.char-icon-big').attributes.style.match(/www\.margonem\.pl\/obrazki\/[^\.]+\.gif/)![0],
     dataContainers[0].text.trim().toLowerCase(),
     parseDate(dataContainers[1].structuredText.split('\n')),
     toNumber(dataContainers[2].text),

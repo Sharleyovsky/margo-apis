@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 import { getClan } from './getClan';
-// import { getHeroId } from './getHeroId';
 import { getProfile } from './getProfile';
 import { getRankPage } from './getRankPage';
 
@@ -9,7 +8,6 @@ class Requester {
   public instance: AxiosInstance;
   constructor (config?: AxiosRequestConfig) {
     this.instance = axios.create(config);
-    this.useProxy();
   }
   public getClan(nick: string, world: string) {
     return getClan(nick, world, this.instance);
@@ -20,11 +18,8 @@ class Requester {
   public getRankPage(page: number, world: string) {
     return getRankPage(page, world, this.instance);
   }
-  // public getHeroId(nick: string, world: string) {
-  //   return getHeroId(nick, world, this.instance);
-  // }
   public useProxy() {
-    this.instance.interceptors.request.use((req) => this.proxyMiddleware(req));
+    this.instance.interceptors.request.use((req: any) => this.proxyMiddleware(req));
   }
   private proxyMiddleware (req: AxiosRequestConfig) {
     req.url = 'http://cors-anywhere.herokuapp.com/' + req.url;
