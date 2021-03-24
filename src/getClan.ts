@@ -9,9 +9,9 @@ async function fetchClan(world: string, id: number | string, instance: AxiosInst
     try {
         const response = await instance.get(`http://new.margonem.pl/guilds/view,${world},${id}`, {
             headers: {
-                'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'accept-encoding': 'gzip, deflate, br',
-                'accept-language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,de;q=0.5'
+                // 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                // 'accept-encoding': 'gzip, deflate, br',
+                // 'accept-language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,de;q=0.5'
             }
         });
         if (response.status !== 200) {
