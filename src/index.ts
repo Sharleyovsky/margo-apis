@@ -5,6 +5,7 @@ import { getProfile } from './getProfile';
 import { getRankPage } from './getRankPage';
 
 class Requester {
+  private proxyURL = '';
   public instance: AxiosInstance;
   constructor (config?: AxiosRequestConfig) {
     this.instance = axios.create(config);
@@ -18,11 +19,12 @@ class Requester {
   public getRankPage(page: number, world: string) {
     return getRankPage(page, world, this.instance);
   }
-  public useProxy() {
+  public useProxy(url = 'http://cors-anywhere.herokuapp.com/') {
+    this.proxyURL = url;
     this.instance.interceptors.request.use((req: any) => this.proxyMiddleware(req));
   }
   private proxyMiddleware (req: AxiosRequestConfig) {
-    req.url = 'http://cors-anywhere.herokuapp.com/' + req.url;
+    req.url = this.proxyURL + req.url;
     req.headers['x-requested-with'] = 'axios';
     return req;
   }
