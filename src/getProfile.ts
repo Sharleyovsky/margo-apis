@@ -186,7 +186,7 @@ async function parseProfileCharacters(root: HTMLElement) {
         parseInt($e.getAttribute('data-lvl')!, 10),
         $e.querySelector('.chprofname').getAttribute('value')!,
         $e.getAttribute('data-world')!.substr(1).toLowerCase(),
-        'http://' + outHelper.match(/www\.margonem\.pl\/obrazki\/[^\.]+\.gif/)![0],
+        'http://' + outHelper.match(/\/obrazki\/[^\.]+\.gif/)![0],
         guild,
         new Date(parseInt($e.querySelector('.chlast').getAttribute('value')!, 10) * 1000)
       )
