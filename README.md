@@ -11,7 +11,8 @@ npm i agysx/margo-apis
 ## Usage
 
 ```js
-const apis = require('margo-apis').default;
+const Apis = require('margo-apis').default;
+const apis = new Apis();
 
 (async () => {
   const rank = await apis.getRankPage(1, 'dev');
