@@ -30,4 +30,4 @@ class Requester {
   }
 };
 
-export default new Requester();
+export default Requester;
