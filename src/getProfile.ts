@@ -147,7 +147,7 @@ async function parseMainInfo(root: HTMLElement) {
   }
   return new ProfileInfo(
     header.querySelector('span').text.trim(),
-    'http://' + root.querySelector('.char-icon-big').attributes.style.match(/www\.margonem\.pl\/obrazki\/[^\.]+\.gif/)![0],
+    'https://' + root.querySelector('.char-icon-big').attributes.style.match(/micc.garmory-cdn\.cloud\/obrazki\/[^\.]+\.gif/)![0],
     dataContainers[0].text.trim().toLowerCase(),
     parseDate(dataContainers[1].structuredText.split('\n')),
     toNumber(dataContainers[2].text),
