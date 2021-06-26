@@ -27,9 +27,11 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
+    "@types/sha1": "^1.1.2",
     "axios": "^0.21.1",
     "node-html-parser": "^1.2.20",
-    "qs": "^6.9.4"
+    "qs": "^6.9.4",
+    "sha1": "^1.1.1"
   },
   "keywords": [
     "margo",

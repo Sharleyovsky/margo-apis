@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import sha1 from 'sha1'
 
 import { getClan } from './getClan';
 import { getCookie } from "./getCookie";
@@ -10,7 +11,7 @@ class Requester {
     try {
       const { data, headers } = await axios.post(
         'https://new.margonem.pl/ajax/login',
-        `l=${login}&p=${password}&h2=&security=true`
+        `l=${login}&ph=${sha1(`mleczko${password}`)}&h2=&security=true`
       );
 
       if (data.ok !== 1) {
