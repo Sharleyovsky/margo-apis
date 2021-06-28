@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import sha1 from 'sha1'
+import { createHash } from 'crypto'
 
 import { getClan } from './getClan';
 import { getCookie } from "./getCookie";
@@ -9,9 +9,10 @@ import { getRankPage } from './getRankPage';
 class Requester {
   public static async getAuthData(login: string, password: string): Promise<{ chash: string, user_id: number }> {
     try {
+      const passwordHash = createHash('sha1').update(`mleczko${password}`).digest('hex')
       const { data, headers } = await axios.post(
         'https://new.margonem.pl/ajax/login',
-        `l=${login}&ph=${sha1(`mleczko${password}`)}&h2=&security=true`
+        `l=${login}&ph=${passwordHash}&h2=&security=true`
       );
 
       if (data.ok !== 1) {

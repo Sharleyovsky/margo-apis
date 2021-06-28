@@ -30,8 +30,7 @@
     "@types/sha1": "^1.1.2",
     "axios": "^0.21.1",
     "node-html-parser": "^1.2.20",
-    "qs": "^6.9.4",
-    "sha1": "^1.1.1"
+    "qs": "^6.9.4"
   },
   "keywords": [
     "margo",
