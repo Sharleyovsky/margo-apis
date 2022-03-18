@@ -19,6 +19,8 @@ class Requester {
         throw new Error('Autoryzacja nie powiodła się!');
       }
 
+      headers['set-cookie'] = headers['set-cookie'].splice(3, 5);
+
       return {
         chash: getCookie('chash', headers),
         user_id: parseInt(getCookie('user_id', headers), 10),
