@@ -19,11 +19,12 @@ class Requester {
         throw new Error('Autoryzacja nie powiodła się!');
       }
 
-      headers['set-cookie'] = headers['set-cookie'].splice(3, 5);
+      let cookies = [...headers['set-cookie']];
+      cookies = cookies.length > 3 ? cookies.splice(3) : cookies
 
       return {
-        chash: getCookie('chash', headers),
-        user_id: parseInt(getCookie('user_id', headers), 10),
+        chash: getCookie('chash', cookies),
+        user_id: parseInt(getCookie('user_id', cookies), 10),
       };
     } catch (err) {
       throw new Error(err.toString());
