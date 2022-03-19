@@ -1,5 +1,5 @@
-export const getCookie = (name: string, headers: any[string]) => {
-    for (const cookie of headers) {
+export const getCookie = (name: string, cookies: any[string]) => {
+    for (const cookie of cookies) {
         if (!cookie.includes(name)) {
             continue;
         }
