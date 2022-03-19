@@ -11,12 +11,16 @@ npm i agysx/margo-apis
 ## Usage
 
 ```js
-const Apis = require('margo-apis').default;
-const apis = new Apis();
+// const MargoAPI = require('margo-apis').default;
+import MargoAPI from 'margo-apis';
+const api = new MargoAPI();
 
 (async () => {
-  const rank = await apis.getRankPage(1, 'dev');
-  const clan = await apis.getClan(1, 'dev');
-  const profile = await apis.getProfile(1);
+  const { chash, user_id } = await MargoAPI.getAuthData('login', 'password');
+  api.useAuth({ chash, user_id });
+  api.useProxy();
+  const profile = await api.getProfile(1);
+  const rank = await api.getRankPage('classic', 1);
+  const clan = await api.getClan('classic', 3);
 })();
 ```

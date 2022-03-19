@@ -1,15 +1,18 @@
 import { AxiosInstance } from 'axios';
 import { HTMLElement, Node, parse, TextNode } from 'node-html-parser';
+import { safeCallFactory } from './helpers/safeCallFactory';
+
+const safeCall = safeCallFactory('[MargoAPIS] [ProfilePage] Invalid selector');
 
 export interface IDeputy {
-  id: number,
-  nick: string
+  id: number;
+  nick: string;
 }
 
 export interface IGuild {
-  id: number,
-  name: string,
-  isLeader: boolean
+  id: number;
+  name: string;
+  isLeader: boolean;
 }
 
 export class ProfileInfo {
@@ -24,7 +27,7 @@ export class ProfileInfo {
     public visits: number,
     public daysInGame: number,
     public reputationRatio: number,
-    public deputy: IDeputy | null
+    public deputy: IDeputy | null,
   ) {}
 }
 
@@ -44,11 +47,7 @@ export class ProfileCharacter {
 
 export class ProfileData {
   private body: string;
-  constructor(
-    body: string,
-    public profileInfo: ProfileInfo,
-    public characters: ProfileCharacter[]
-  ) {
+  constructor(body: string, public profileInfo: ProfileInfo, public characters: ProfileCharacter[]) {
     if (body.includes('<div class="profile-custom-page-body">')) {
       const unparsed = body.split('<div class="profile-custom-page-body">')[1].split('<footer >')[0];
       this.body = unparsed.replace(/^[\n\s]*/, '').replace(/[\n\s]*(<\/div>[\n\s]*){8}$/, '');
@@ -66,14 +65,26 @@ export class ProfileData {
     const replaced = this.body
       .replace(/\\u([\d\w]{4})/gi, (_, grp) => String.fromCharCode(parseInt(grp, 16)))
       .replace(/<BR>/gi, '\n')
-      .replace(/<center>/gi, '[center]').replace(/<\/center>/gi, '[/center]')
-      .replace(/<blockquote>/gi, '[cytat]').replace(/<\/blockquote>/gi, '[/cytat]')
-      .replace(/<i>/gi, '[i]').replace(/<\/i>/gi, '[/i]')
-      .replace(/<b>/gi, '[b]').replace(/<\/b>/gi, '[/b]')
-      .replace(/<u>/gi, '[u]').replace(/<\/u>/gi, '[/u]')
-      .replace(/<code>/gi, '[code]').replace(/<\/code>/gi, '[/code]')
-      .replace(/<div class=itemborder><IMG src='http:\/\/www\.margonem\.pl\/obrazki\/npc\/mas\/nic32x32\.gif'><\/div>/gi, 'ITEM#0')
-      .replace(/<div class="itemborder"><div class="margoitem highlight[^"]*"><img src="[^"]*" tip='{"hid":"(\d+)",[^}]+}' ctip="item"><\/div><\/div>/gis, 'ITEM#$1')
+      .replace(/<center>/gi, '[center]')
+      .replace(/<\/center>/gi, '[/center]')
+      .replace(/<blockquote>/gi, '[cytat]')
+      .replace(/<\/blockquote>/gi, '[/cytat]')
+      .replace(/<i>/gi, '[i]')
+      .replace(/<\/i>/gi, '[/i]')
+      .replace(/<b>/gi, '[b]')
+      .replace(/<\/b>/gi, '[/b]')
+      .replace(/<u>/gi, '[u]')
+      .replace(/<\/u>/gi, '[/u]')
+      .replace(/<code>/gi, '[code]')
+      .replace(/<\/code>/gi, '[/code]')
+      .replace(
+        /<div class=itemborder><IMG src='http:\/\/www\.margonem\.pl\/obrazki\/npc\/mas\/nic32x32\.gif'><\/div>/gi,
+        'ITEM#0',
+      )
+      .replace(
+        /<div class="itemborder"><div class="margoitem highlight[^"]*"><img src="[^"]*" tip='{"hid":"(\d+)",[^}]+}' ctip="item"><\/div><\/div>/gis,
+        'ITEM#$1',
+      )
       .replace(/<img src=http(s?)([^>]*)>/g, 'img$2')
       .replace(/<a href="([^"]*)" target="_blank" rel="noopener noreferrer">(.*)<\/a>/gi, '$1');
     const root = parse(replaced) as HTMLElement;
@@ -81,9 +92,9 @@ export class ProfileData {
       if (element instanceof TextNode) {
         return element.rawText;
       }
-      if(element instanceof HTMLElement) {
+      if (element instanceof HTMLElement) {
         const style = element.getAttribute('style') || '';
-        const destructedChilds = element.childNodes.map(node => destruct(node)).join('');
+        const destructedChilds = element.childNodes.map((node) => destruct(node)).join('');
         if (/^font-size:(\d+)px$/.test(style)) {
           return `[size=${RegExp.$1}]${destructedChilds}[/size]`;
         }
@@ -93,7 +104,7 @@ export class ProfileData {
         return destructedChilds;
       }
       return element.toString();
-    }
+    };
     return destruct(root);
   }
 }
@@ -109,20 +120,14 @@ function parseDate(arr: string[]) {
   return new Date(`${arr[0]} ${x[1]}-${x[0]}-${x[2]}`);
 }
 
-async function fetchProfile (id: string | number, instance: AxiosInstance) {
+async function fetchProfile(id: string | number, instance: AxiosInstance) {
   try {
-    const response = await instance.get(`https://new.margonem.pl/profile/view,${id}`, {
-      headers: {
-        // 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        // 'accept-encoding': 'gzip, deflate, br',
-        // 'accept-language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,fr;q=0.6,de;q=0.5'
-      }
-    });
+    const response = await instance.get(`https://www.margonem.pl/profile/view,${id}`);
     if (response.status !== 200 || response.data.includes('<center class=msg>Nie ma takiego gracza</center>')) {
       throw new Error('Brak gracza');
     }
     return response.data as string;
-  } catch (err) {
+  } catch (err: any) {
     if (err.response) {
       if (err.response.status !== 200) {
         throw new Error('Brak gracza');
@@ -134,20 +139,25 @@ async function fetchProfile (id: string | number, instance: AxiosInstance) {
 }
 
 async function parseMainInfo(root: HTMLElement) {
-  const header = root.querySelector('.profile-header');
-  const dataContainers = header.querySelector('.profile-header-data-container').querySelectorAll('.profile-header-data .value');
+  const header = safeCall(root.querySelector.bind(root), '.profile-header');
+  const dataContainers = safeCall(header.querySelector.bind(header), '.profile-header-data-container').querySelectorAll(
+    '.profile-header-data .value',
+  );
   const deputyHelper = dataContainers[3].text.trim();
   let deputy = null;
-  if(deputyHelper !== 'Brak'){
-      const deputyIdHelper = dataContainers[3].querySelector('a').getAttribute('href')!;
-      deputy = {
-          id: parseInt(/(\d+)/.exec(deputyIdHelper)![1], 10),
-          nick: deputyHelper
-      }
+  if (deputyHelper !== 'Brak') {
+    const deputyIdHelper = safeCall(dataContainers[3].querySelector.bind(dataContainers[3]), 'a').getAttribute('href') || '';
+    deputy = {
+      id: parseInt(/(\d+)/.exec(deputyIdHelper)?.[1] ?? '', 10),
+      nick: deputyHelper,
+    };
   }
   return new ProfileInfo(
-    header.querySelector('span').text.trim(),
-    'https://' + root.querySelector('.char-icon-big').attributes.style.match(/micc.garmory-cdn\.cloud\/obrazki\/[^\.]+\.gif/)![0],
+    safeCall(header.querySelector.bind(header), 'span').text.trim(),
+    'https://' +
+      safeCall(root.querySelector.bind(root), '.char-icon-big').attributes.style.match(
+        /micc.garmory-cdn\.cloud\/obrazki\/[^.]+\.gif/,
+      )?.[0],
     dataContainers[0].text.trim().toLowerCase(),
     parseDate(dataContainers[1].structuredText.split('\n')),
     toNumber(dataContainers[2].text),
@@ -156,61 +166,64 @@ async function parseMainInfo(root: HTMLElement) {
     toNumber(dataContainers[6].text),
     toNumber(dataContainers[7].text),
     toNumber(dataContainers[8].text),
-    deputy
+    deputy,
   );
 }
 
 async function parseProfileCharacters(root: HTMLElement) {
   const charlist = root.querySelectorAll('.character-list li');
   return charlist.map(($e) => {
-      const outHelper = $e.querySelector('.cimg').getAttribute('style')!;
-      const guildid = parseInt($e.querySelector('.chguildid').getAttribute('value')!, 10);
-      let guild: IGuild | null = null;
-      if (guildid) {
-          let guildname = $e.querySelector('.chguild').getAttribute('value')!;
-          let leader = false;
-          if (/ \(założyciel\)$/.test(guildname)) {
-              guildname = guildname.substring(0, guildname.length - 13);
-              leader = true;
-          }
-          guild = {
-              id: guildid,
-              isLeader: leader,
-              name: guildname
-          }
+    const outHelper = safeCall($e.querySelector.bind($e), '.cimg').getAttribute('style') ?? '';
+    const guildid = parseInt(safeCall($e.querySelector.bind($e), '.chguildid').getAttribute('value') ?? '', 10);
+    let guild: IGuild | null = null;
+    if (guildid) {
+      let guildname = safeCall($e.querySelector.bind($e), '.chguild').getAttribute('value') ?? '';
+      let leader = false;
+      if (/ \(założyciel\)$/.test(guildname)) {
+        guildname = guildname.substring(0, guildname.length - 13);
+        leader = true;
       }
-      const character = new ProfileCharacter(
-        parseInt($e.getAttribute('data-id')!, 10),
-        $e.getAttribute('data-nick')!,
-        $e.querySelector('.chgender').getAttribute('value')!,
-        parseInt($e.getAttribute('data-lvl')!, 10),
-        $e.querySelector('.chprofname').getAttribute('value')!,
-        $e.getAttribute('data-world')!.substr(1).toLowerCase(),
-        'http://' + outHelper.match(/\/obrazki\/[^\.]+\.gif/)![0],
-        guild,
-        new Date(parseInt($e.querySelector('.chlast').getAttribute('value')!, 10) * 1000)
-      )
-      return character
+      guild = {
+        id: guildid,
+        isLeader: leader,
+        name: guildname,
+      };
+    }
+    const character = new ProfileCharacter(
+      parseInt($e.getAttribute('data-id') ?? '', 10),
+      $e.getAttribute('data-nick') ?? '',
+      safeCall($e.querySelector.bind($e), '.chgender').getAttribute('value') ?? '',
+      parseInt($e.getAttribute('data-lvl') ?? '', 10),
+      safeCall($e.querySelector.bind($e), '.chprofname').getAttribute('value') ?? '',
+      ($e.getAttribute('data-world') ?? '').substring(1).toLowerCase(),
+      'http://' + outHelper.match(/\/obrazki\/[^.]+\.gif/)?.[0],
+      guild,
+      new Date(parseInt(safeCall($e.querySelector.bind($e), '.chlast').getAttribute('value') ?? '', 10) * 1000),
+    );
+    return character;
   });
 }
 
-async function parseProfile (body: string) {
+async function parseProfile(body: string) {
   const root = parse(body.split('<body>')[1].split('</body>')[0], {
     lowerCaseTagName: false,
-    pre: false,
-    script: false,
-    style: false
+    blockTextElements: {
+      pre: false,
+      script: false,
+      style: false,
+    },
   }) as HTMLElement;
   const profileInfo = await parseMainInfo(root);
   const profileCharacters = await parseProfileCharacters(root);
-  return new ProfileData(body, profileInfo, profileCharacters)
+  return new ProfileData(body, profileInfo, profileCharacters);
 }
 
-export async function getProfile (id: number | string, instance: AxiosInstance){
+export async function getProfile(id: number | string, instance: AxiosInstance) {
   try {
-      const res = await fetchProfile(id, instance);
-      return parseProfile(res!);
-  } catch (err) {
-      throw new Error(err.toString());
+    const res = await fetchProfile(id, instance);
+    if (res === undefined) throw new Error('Fetch profile failed');
+    return parseProfile(res);
+  } catch (err: any) {
+    throw new Error(err.toString());
   }
 }
