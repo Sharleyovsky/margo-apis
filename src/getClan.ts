@@ -36,14 +36,16 @@ function parseClanPage(body: string) {
     },
   }) as HTMLElement;
   const list: MemberInfo[] = [];
-  safeCall(root.querySelector.bind(root), '.guild-members-container').querySelectorAll('.nick.table-borders').forEach(($e, idx) => {
-    if (!idx) {
-      return;
-    }
-    const helper = (safeCall($e.querySelector.bind($e), 'a').getAttribute('href') ?? '').match(/\d+/g) || [];
-    const member = new MemberInfo(helper[0], helper[1], $e.text.trim());
-    list.push(member);
-  });
+  safeCall(root.querySelector.bind(root), '.guild-members-container')
+    .querySelectorAll('.nick.table-borders')
+    .forEach(($e, idx) => {
+      if (!idx) {
+        return;
+      }
+      const helper = (safeCall($e.querySelector.bind($e), 'a').getAttribute('href') ?? '').match(/\d+/g) || [];
+      const member = new MemberInfo(helper[0], helper[1], $e.text.trim());
+      list.push(member);
+    });
   return {
     members: list,
   };

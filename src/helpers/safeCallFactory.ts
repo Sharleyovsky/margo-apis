@@ -6,4 +6,4 @@ export const safeCallFactory = (prefix: string) => {
     }
     return ret;
   };
-}
+};

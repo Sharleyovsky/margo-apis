@@ -146,7 +146,8 @@ async function parseMainInfo(root: HTMLElement) {
   const deputyHelper = dataContainers[3].text.trim();
   let deputy = null;
   if (deputyHelper !== 'Brak') {
-    const deputyIdHelper = safeCall(dataContainers[3].querySelector.bind(dataContainers[3]), 'a').getAttribute('href') || '';
+    const deputyIdHelper =
+      safeCall(dataContainers[3].querySelector.bind(dataContainers[3]), 'a').getAttribute('href') || '';
     deputy = {
       id: parseInt(/(\d+)/.exec(deputyIdHelper)?.[1] ?? '', 10),
       nick: deputyHelper,

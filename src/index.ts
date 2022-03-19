@@ -56,7 +56,7 @@ export default class Requester {
   public getRankPage(world: string, page: number) {
     return getRankPage(page, world, this.instance);
   }
-  public getGID (world: string, nickname: string) {
+  public getGID(world: string, nickname: string) {
     return getHeroId(nickname, world, this.instance);
   }
   public useProxy(url = 'http://cors-anywhere.herokuapp.com/') {
