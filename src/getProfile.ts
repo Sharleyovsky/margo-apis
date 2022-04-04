@@ -197,7 +197,7 @@ async function parseProfileCharacters(root: HTMLElement) {
       parseInt($e.getAttribute('data-lvl') ?? '', 10),
       safeCall($e.querySelector.bind($e), '.chprofname').getAttribute('value') ?? '',
       ($e.getAttribute('data-world') ?? '').substring(1).toLowerCase(),
-      'http://' + outHelper.match(/\/obrazki\/[^.]+\.gif/)?.[0],
+      'https://micc.garmory-cdn.cloud' + outHelper.match(/\/obrazki\/[^.]+\.gif/)?.[0],
       guild,
       new Date(parseInt(safeCall($e.querySelector.bind($e), '.chlast').getAttribute('value') ?? '', 10) * 1000),
     );
