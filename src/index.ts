@@ -1,11 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-<<<<<<< HEAD
-import sha1 from 'sha1'
-=======
 import { createHash } from 'crypto';
 
 import { getCookie } from './helpers/getCookie';
->>>>>>> 425036ef339fb3f79498b294b91d13c3a66a548f
 
 import { getClan } from './getClan';
 import { getProfile } from './getProfile';
@@ -20,6 +16,19 @@ export interface AuthData {
 export default class Requester {
   public static async getAuthData(login: string, password: string): Promise<AuthData> {
     try {
+      const passwordHash = createHash('sha1').update(`mleczko${password}`).digest('hex');
+      const { data, headers } = await axios.post(
+        'https://www.margonem.pl/ajax/login',
+        `l=${login}&ph=${passwordHash}&t=&h2=&security=true`,
+      );
+
+      if (data.ok !== 1) {
+        throw new Error('Autoryzacja nie powiodła się!');
+      }
+
+      return {
+        chash: getCookie('chash', headers || {}) ?? '',
+        user_id: parseInt(getCookie('user_id', headers || {}) ?? '', 10),
       };
     } catch (err: any) {
       throw new Error(err.toString());
